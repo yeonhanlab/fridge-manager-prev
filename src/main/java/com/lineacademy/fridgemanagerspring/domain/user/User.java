@@ -2,12 +2,15 @@ package com.lineacademy.fridgemanagerspring.domain.user;
 
 import com.lineacademy.fridgemanagerspring.domain.common.BaseTimeEntity;
 import com.lineacademy.fridgemanagerspring.domain.enums.RoleType;
+import com.lineacademy.fridgemanagerspring.domain.fridge.Fridge;
 import jakarta.persistence.*;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity // DB 테이블과 매핑되는 JPA 엔티티 클래스임을 선언
 @Table(name = "user") // 매핑될 DB 테이블 이름을 'user'로 지정
@@ -39,6 +42,11 @@ public class User extends BaseTimeEntity {
     private RoleType role = RoleType.USER;
 
     // TODO : 다른 테이블과의 관계를 기록해줘야함
+
+    // mappedBy = "user"는 Fridge 엔티티에 만들어진 user 필드명
+    // cascade는 연결지은 이 user가 삭제될 경우 연결될 fridge는 어떻게 할까?
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
+    private List<Fridge> fridges = new ArrayList<>();
 
     @Builder
     private User(String nickname, String password, String email, LocalDateTime birthdate, RoleType role) {
