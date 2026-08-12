@@ -3,6 +3,7 @@ package com.lineacademy.fridgemanagerspring.domain.user;
 import com.lineacademy.fridgemanagerspring.domain.common.BaseTimeEntity;
 import com.lineacademy.fridgemanagerspring.domain.enums.RoleType;
 import jakarta.persistence.*;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -38,4 +39,26 @@ public class User extends BaseTimeEntity {
     private RoleType role = RoleType.USER;
 
     // TODO : 다른 테이블과의 관계를 기록해줘야함
+
+    @Builder
+    private User(String nickname, String password, String email, LocalDateTime birthdate, RoleType role) {
+        this.nickname = nickname;
+        this.password = password;
+        this.email = email;
+        this.birthdate = birthdate;
+        if (role != null) this.role = role;
+
+    }
+
+    public void updateNickname(String nickname) {
+        this.nickname = nickname;
+    }
+
+    public void updateBirthdate(LocalDateTime birthdate) {
+        this.birthdate = birthdate;
+    }
+
+    public void updatePassword(String password) {
+        this.password = password;
+    }
 }
