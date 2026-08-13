@@ -26,10 +26,10 @@ public class BaseTimeEntity {
     private LocalDateTime createdAt;
 
     @LastModifiedDate // 엔티티의 값이 변경될 때마다 자동으로 시간을 업데이트
-    @Column()
+    @Column(name = "updated_at")
     private LocalDateTime updateAt;
 
-    @Column()
+    @Column(name = "deleted_at")
     private LocalDateTime deletedAt;
 
 
