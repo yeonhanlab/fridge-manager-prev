@@ -31,8 +31,9 @@ public class Fridge extends BaseTimeEntity {
     private List<Product> products = new ArrayList<>();
 
     @Builder
-    public Fridge(String name) {
+    public Fridge(String name, User user) {
         this.name = name;
+        this.user = user;
     }
 
     public void updateName(String name) {

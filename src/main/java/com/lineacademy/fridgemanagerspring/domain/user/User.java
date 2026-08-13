@@ -11,6 +11,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -38,7 +39,7 @@ public class User extends BaseTimeEntity {
     private String email;
 
     @Column()
-    private LocalDateTime birthdate;
+    private LocalDate birthdate;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
@@ -59,7 +60,7 @@ public class User extends BaseTimeEntity {
     private List<ShoppingList> shoppingLists = new ArrayList<>();
 
     @Builder
-    private User(String nickname, String password, String email, LocalDateTime birthdate, RoleType role) {
+    private User(String nickname, String password, String email, LocalDate birthdate, RoleType role) {
         this.nickname = nickname;
         this.password = password;
         this.email = email;
@@ -72,7 +73,7 @@ public class User extends BaseTimeEntity {
         this.nickname = nickname;
     }
 
-    public void updateBirthdate(LocalDateTime birthdate) {
+    public void updateBirthdate(LocalDate birthdate) {
         this.birthdate = birthdate;
     }
 
