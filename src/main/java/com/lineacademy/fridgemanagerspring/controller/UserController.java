@@ -88,7 +88,7 @@ public class UserController {
              // ResponseEntity.ok(Map.of(어쩌구, 저쩌구))로 쓸 수 있음
              return ResponseEntity.ok(Map.of(
                      "message", "로그인에 성공했습니다.",
-                     "date", Map.of(
+                     "data", Map.of(
                              "user", UserResponse.from(user),
                              "token", token
                      )

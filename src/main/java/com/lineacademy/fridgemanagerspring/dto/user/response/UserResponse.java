@@ -20,7 +20,7 @@ public class UserResponse {
     private Long id;
     private String nickname;
     private String email;
-    private LocalDate birthDate;
+    private LocalDate birthdate;
     private RoleType role;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
@@ -31,7 +31,7 @@ public class UserResponse {
                 .id(user.getId())
                 .nickname(user.getNickname())
                 .email(user.getEmail())
-                .birthDate(user.getBirthdate())
+                .birthdate(user.getBirthdate())
                 .role(user.getRole())
                 .createdAt(user.getCreatedAt())
                 .updatedAt(user.getUpdateAt())
