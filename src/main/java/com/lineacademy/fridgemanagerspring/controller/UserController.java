@@ -5,6 +5,7 @@ import com.lineacademy.fridgemanagerspring.domain.user.User;
 import com.lineacademy.fridgemanagerspring.dto.user.request.CreateUserRequest;
 import com.lineacademy.fridgemanagerspring.dto.user.request.LoginRequest;
 import com.lineacademy.fridgemanagerspring.dto.user.request.UpdateUserRequest;
+import com.lineacademy.fridgemanagerspring.dto.user.request.WithdrawUserRequest;
 import com.lineacademy.fridgemanagerspring.dto.user.response.UserResponse;
 import com.lineacademy.fridgemanagerspring.service.UserService;
 import com.lineacademy.fridgemanagerspring.utils.JwtUtil;
@@ -115,7 +116,7 @@ public class UserController {
             User updatedUser = userService.updateUser(currentUserId, request);
             return ResponseEntity.ok(Map.of(
                     "message", "회원정보가 성공적으로 수정되었습니다.",
-                    "dadta", UserResponse.from(updatedUser)
+                    "data", UserResponse.from(updatedUser)
             ));
 
         } catch (RuntimeException e) {
@@ -135,6 +136,38 @@ public class UserController {
                     ));
 
         }
+    }
+
+    @PreAuthorize("isAuthenticated()")
+    @PatchMapping("/withdraw")
+    public ResponseEntity<Map<String, Object>> withdrawUser(
+            @AuthenticationPrincipal Long userId,
+            @Valid @RequestBody WithdrawUserRequest request
+            ) {
+                try{
+                    userService.withdrawUser(userId, request);
+                    return ResponseEntity.ok(Map.of(
+                            "message", "회원정보가 성공적으로 탈퇴었습니다."
+                    ));
+
+
+                } catch (RuntimeException e) {
+                    if (e.getMessage().equals("USER_NOT_FOUND"))
+                        return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                                .body(Map.of(
+                                        "message", "해당 사용자를 찾을 수 없습니다."
+                                ));
+                    if (e.getMessage().equals("INVALID_CREDENTIALS"))
+                        return ResponseEntity.status(HttpStatus.CONFLICT)
+                                .body(Map.of(
+                                        "message", "입력하신 비밀번호가 일치하지 않습니다."
+                                ));
+                    return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                            .body(Map.of(
+                                    "message", "서버 에러가 발생되었습니다."
+                            ));
+            }
+
     }
 
 }
