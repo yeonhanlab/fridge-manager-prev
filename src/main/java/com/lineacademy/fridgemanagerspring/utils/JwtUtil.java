@@ -49,7 +49,7 @@ public class JwtUtil {
     }
 
     // validateToken을 통해 검증한 후, 정상 토큰일 때에만 실행
-    public Long getUserIdFormToken(String token) {
+    public Long getUserIdFromToken(String token) {
         return Jwts.parser()
                 .verifyWith(key) // secretKey로 인증처리
                 .build()
