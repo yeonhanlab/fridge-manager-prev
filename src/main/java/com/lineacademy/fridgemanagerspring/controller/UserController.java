@@ -3,8 +3,10 @@ package com.lineacademy.fridgemanagerspring.controller;
 
 import com.lineacademy.fridgemanagerspring.domain.user.User;
 import com.lineacademy.fridgemanagerspring.dto.user.request.CreateUserRequest;
+import com.lineacademy.fridgemanagerspring.dto.user.request.LoginRequest;
 import com.lineacademy.fridgemanagerspring.dto.user.response.UserResponse;
 import com.lineacademy.fridgemanagerspring.service.UserService;
+import com.lineacademy.fridgemanagerspring.utils.JwtUtil;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.aspectj.apache.bcel.classfile.Code;
@@ -23,7 +25,8 @@ import java.util.Map;
                             // 매개변수 생성자를 자동으로 생성해주는 어느테이션
 public class UserController {
     // 멤버변수
-    private final UserService userService;   // Java에서는 객체를 만들어야 실행이 가능하니까
+    private final UserService userService;     // Java에서는 객체를 만들어야 실행이 가능하니까
+    private final JwtUtil jwtUtil;             // Bean이기 때문에 새로 생성하는게 아니라 있는 걸 불러오게 됨
 
     // 멤버메서드
     @PostMapping("/create")  // class의 매핑정보인 "/users"뒤에 "/create"가 붙고, POST 방식이면 이 메서드 실행
@@ -67,6 +70,38 @@ public class UserController {
 
         }
 
+    }
+
+    @PostMapping("/login")
+    public ResponseEntity<Map<String, Object>> login(
+            @Valid @RequestBody LoginRequest request
+    ) {
+         try {
+             // 1. 사용자가 입력해온 값을 DB에서 조회해서 있는지 확인
+             User user = userService.login(request);
+
+             // 2. 토큰을 생성해서 response 전달
+             String token = jwtUtil.generateToken(user.getId());
+
+             // ResponseEntity.status(200).body(Map.of(어쩌구, 저쩌구)
+             // ResponseEntity.ok(Map.of(어쩌구, 저쩌구))로 쓸 수 있음
+             return ResponseEntity.ok(Map.of(
+                     "message", "로그인에 성공했습니다.",
+                     "date", Map.of(
+                             "user", UserResponse.from(user),
+                             "token", token
+                     )
+             ));
+         } catch (RuntimeException e) {
+             if (e.getMessage().equals("INVALID_CREDENTIALS")) {
+                 return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of(
+                         "message", "아이디 또는 비밀번호가 일치하지 않습니다."
+                 ));
+             }
+             return ResponseEntity.status(500).body(Map.of(
+                     "message", "서버 에러"
+             ));
+         }
     }
 
 }

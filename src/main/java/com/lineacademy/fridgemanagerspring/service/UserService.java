@@ -3,8 +3,10 @@ package com.lineacademy.fridgemanagerspring.service;
 import com.lineacademy.fridgemanagerspring.domain.fridge.Fridge;
 import com.lineacademy.fridgemanagerspring.domain.user.User;
 import com.lineacademy.fridgemanagerspring.dto.user.request.CreateUserRequest;
+import com.lineacademy.fridgemanagerspring.dto.user.request.LoginRequest;
 import com.lineacademy.fridgemanagerspring.repository.FridgeRepository;
 import com.lineacademy.fridgemanagerspring.repository.UserRepository;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -38,7 +40,7 @@ public class UserService {
         }
 
         // 닉네임 중복 체크
-        if (userRepository.existsByNickName(request.getNickname())) {
+        if (userRepository.existsByNickname(request.getNickname())) {
             throw new IllegalArgumentException("ALREADY_EXISTS_NICKNAME");
         }
 
@@ -68,5 +70,25 @@ public class UserService {
 
         return user;
 
+    }
+
+    public User login(LoginRequest request) {
+        // 1. 받아온 emal값을 통해 사용자가 있는지 확인하고
+        // 함수처럼 만들어서 쓸 수 있는게 Java에서 지원되지만 함수는 아니고
+        // 람다 표현식 () ->
+        User user = userRepository.findByEmail(request.getEmail())
+                .orElseThrow(() -> new RuntimeException("INVALID_CREDENTIALS"));
+
+        // 2. 사용자가 존재한다면, 탈퇴된 회원인지를 걷사하고
+        if (user.getDeletedAt() != null) {
+            throw new RuntimeException("INVALID_CREDENTIALS");
+        }
+
+        // 3. 비밀번호가 일치하는지 확인하고
+        if (!passwordEncoder.matches(request.getPassword(), user.getPassword())) {
+            throw new RuntimeException("INVALID_CREDENTIALS");
+        }
+
+        return user;
     }
 }
