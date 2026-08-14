@@ -4,6 +4,7 @@ package com.lineacademy.fridgemanagerspring.controller;
 import com.lineacademy.fridgemanagerspring.domain.user.User;
 import com.lineacademy.fridgemanagerspring.dto.user.request.CreateUserRequest;
 import com.lineacademy.fridgemanagerspring.dto.user.request.LoginRequest;
+import com.lineacademy.fridgemanagerspring.dto.user.request.UpdateUserRequest;
 import com.lineacademy.fridgemanagerspring.dto.user.response.UserResponse;
 import com.lineacademy.fridgemanagerspring.service.UserService;
 import com.lineacademy.fridgemanagerspring.utils.JwtUtil;
@@ -12,10 +13,9 @@ import lombok.RequiredArgsConstructor;
 import org.aspectj.apache.bcel.classfile.Code;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.Map;
 
@@ -102,6 +102,39 @@ public class UserController {
                      "message", "서버 에러"
              ));
          }
+    }
+
+    // 이미 SecurityConfig에서 사용자를 확인하였고, 로그인된 요청이라는걸 알기 때문에 여기에 도달할 수 있는 건 맞음
+    @PreAuthorize("isAuthenticated()")    // 인증된 회원인지 여부를 검사하는 어노테이션
+    @PatchMapping("/update")
+    public ResponseEntity<Map<String, Object>> updateUser(
+            @AuthenticationPrincipal Long currentUserId, // 로그인 사용자 ID를 꺼내줌
+            @Valid @RequestBody UpdateUserRequest request
+            ) {
+        try {
+            User updatedUser = userService.updateUser(currentUserId, request);
+            return ResponseEntity.ok(Map.of(
+                    "message", "회원정보가 성공적으로 수정되었습니다.",
+                    "dadta", UserResponse.from(updatedUser)
+            ));
+
+        } catch (RuntimeException e) {
+            if (e.getMessage().equals("USER_NOT_FOUND"))
+                return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                        .body(Map.of(
+                                "message", "해당 사용자를 찾을 수 없습니다."
+                        ));
+            if (e.getMessage().equals("DUPLICATED_NICKNAME"))
+                return ResponseEntity.status(HttpStatus.CONFLICT)
+                        .body(Map.of(
+                                "message", "이미 사용중인 닉네임입니다."
+                        ));
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(Map.of(
+                            "message", "서버 에러가 발생되었습니다."
+                    ));
+
+        }
     }
 
 }

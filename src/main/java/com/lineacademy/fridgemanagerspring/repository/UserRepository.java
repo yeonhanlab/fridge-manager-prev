@@ -16,6 +16,6 @@ public interface UserRepository extends JpaRepository<User, Long> {
     // SELECT count(*) FROM User WHERE nickname = ""  => 없으면 0, 있으면 양수가 나옴 => 0일때 fasle, 양수일 때 true
     boolean existsByNickname(String nickname);
 
-    // 내 ID를 제외하고 해당 닉네임이 존재하는지 검사하는 메서드
+    // 내 ID를 가진 데이터를 제외하고 해당 닉네임이 존재하는지 검사하는 메서드
     boolean existsByNicknameAndIdNot(String nickname, Long id);
 }
