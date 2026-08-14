@@ -2,7 +2,9 @@ package com.lineacademy.fridgemanagerspring.service;
 
 
 import com.lineacademy.fridgemanagerspring.domain.notice.Notice;
+import com.lineacademy.fridgemanagerspring.dto.notice.request.NoticeRequest;
 import com.lineacademy.fridgemanagerspring.repository.NoticeRepository;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -25,5 +27,15 @@ public class NoticeService {
     @Transactional
     public Notice getNoticeById(Long noticeId) {
         return noticeRepository.findById(noticeId).orElseThrow(() -> new RuntimeException("NOT_FOUND_NOTICE"));
+    }
+
+    @Transactional
+    public Notice createNotice(@Valid NoticeRequest request) {
+        Notice notice = Notice.builder()
+                .title(request.getTitle())
+                .content(request.getContent())
+                .build();
+
+        return null;
     }
 }
